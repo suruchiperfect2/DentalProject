@@ -1,0 +1,86 @@
+@import "tailwindcss";
+/* Add these CSS variables at the top of your global CSS file */
+:root {
+  --deep-navy: #1a2b4c;
+  --teal-200: #99f6e4;
+  --teal-300: #5eead4;
+  --teal-400: #2dd4bf;
+  --teal-500: #14b8a6;
+  --teal-600: #0d9488;
+  --teal-50: #f0fdfa;
+  --teal-100: #ccfbf1;
+  --sky-200: #bae6fd;
+  --sky-300: #7dd3fc;
+  --sky-400: #38bdf8;
+  --sky-500: #0ea5e9;
+  --sky-600: #0284c7;
+  --sky-50: #f0f9ff;
+  --slate-50: #f8fafc;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+}
+
+/* Utility classes for the footer */
+.text-deep-navy {
+  color: var(--deep-navy);
+}
+
+.bg-deep-navy {
+  background-color: var(--deep-navy);
+}
+
+.from-deep-navy {
+  --tw-gradient-from: var(--deep-navy);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(26, 43, 76, 0));
+}
+
+.shadow-soft-medical {
+  box-shadow: 0 8px 20px rgba(26, 43, 76, 0.08);
+}
+
+/* Animation classes */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Group hover utilities if not present */
+.group:hover .group-hover\:scale-105 {
+  transform: scale(1.05);
+}
+
+.group:hover .group-hover\:translate-x-0 {
+  transform: translateX(0);
+}
+
+.group:hover .group-hover\:translate-x-1 {
+  transform: translateX(0.25rem);
+}
+
+.group:hover .group-hover\:translate-x-2 {
+  transform: translateX(0.5rem);
+}
+
+.group:hover .group-hover\:scale-110 {
+  transform: scale(1.1);
+}
+
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
+}
