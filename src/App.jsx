@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "r
 
 import NavBar from "./components/NavBar";
 import Dashboard from "./pages/Dashboard";
-import Footer from "./components/footer";
+import Footer from "./components/Footer";
 import Hero from "./components/Hero";
 
 import About from "./pages/About";
