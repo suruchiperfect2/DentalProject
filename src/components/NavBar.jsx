@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
   Clock, Mail, Phone, Menu, X, Calendar, ChevronRight, 
-  Home, User, Stethoscope, Star, IndianRupee, MessageSquare 
+  Home, User, Stethoscope, Star, IndianRupee, MessageSquare, Info 
 } from 'lucide-react';
 import logo from "../assets/logo_no_background.png"; // Your logo import
 
@@ -12,9 +12,14 @@ const NavBar = () => {
 
   const menuItems = [
     { 
+      path: "/about", 
+      label: "About Us",
+      icon: <Info className="w-4 h-4" />
+    },
+    { 
       label: "Services", 
       dropdown: [
-        { path: "/services/dental-implants", label: "Dental Implants" },
+        { path: "/dental-implants", label: "Dental Implants" },
         { path: "/Crown", label: "Crowns" },
         { path: "/Deepbite", label: "Deep Bite" },
         { path: "/Dentalfluorosis", label: "Dental Fluorosis" },
@@ -120,7 +125,6 @@ const NavBar = () => {
                     key={item.label} 
                     className="relative"
                     onMouseEnter={() => item.dropdown && setActiveDropdown(item.label)}
-                    // Removed onMouseLeave from here - now handled by dropdown
                   >
                     {item.dropdown ? (
                       <div>
@@ -191,6 +195,7 @@ const NavBar = () => {
                         className="flex items-center gap-1.5 text-deep-navy font-medium hover:text-teal-600 transition-colors duration-300 group"
                         onClick={handleNavigation}
                       >
+                        {item.icon && <span className="text-teal-500">{item.icon}</span>}
                         <span>{item.label}</span>
                         <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-teal-400 to-teal-600 group-hover:w-full transition-all duration-300"></span>
                       </Link>
@@ -303,6 +308,7 @@ const NavBar = () => {
                         handleNavigation();
                       }}
                     >
+                      {item.icon && <span className="text-teal-500">{item.icon}</span>}
                       <span>{item.label}</span>
                     </Link>
                   )}

@@ -1,12 +1,15 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 
-import NavBar from "./components/navbar";
+import NavBar from "./components/NavBar";
 import Dashboard from "./pages/Dashboard";
 import Footer from "./components/footer";
+import Hero from "./components/Hero";
 
-import Home from "./pages/Home";
-import Profile from "./pages/Profile";
+import About from "./pages/About";
+
+
+
 import Services from "./pages/Service";
 
 
@@ -24,6 +27,7 @@ import GenralDentistry from "./pages/GenralDentistry";
 import Earlychildhoodcare from "./pages/Earlychildhoodcare";
 import TeethWhitening from "./pages/TeethWhitening";
 import Spacing from "./pages/Spacing";
+
 
 
 
@@ -66,8 +70,11 @@ const AppContent = () => {
           <Route path="/" element={<Dashboard />} />
           
           {/* Other pages */}
-          <Route path="/home" element={<Home />} /> {/* Agar Home alag page hai to */}
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/Hero" element={<Hero />} /> {/* Agar Hero alag component hai to */}
+          <Route path="/About" element={<About />} />
+         
+          
+
           <Route path="/services" element={<Services />} />
 
 
