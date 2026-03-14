@@ -3,7 +3,47 @@ import React, { useState, useEffect, useRef } from 'react'
 const Hero = () => {
   const [showText, setShowText] = useState(false);
   const [counts, setCounts] = useState({ years: 0, patients: 0, rating: 0 });
+  const [showConsultModal, setShowConsultModal] = useState(false);
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [showEmergencyBanner, setShowEmergencyBanner] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [selectedTreatment, setSelectedTreatment] = useState(null);
+  const [insuranceProvider, setInsuranceProvider] = useState('');
+  const [showInsuranceCheck, setShowInsuranceCheck] = useState(false);
+  const [insuranceResult, setInsuranceResult] = useState(null);
+  const [recentReviews, setRecentReviews] = useState([]);
+  const [currentTip, setCurrentTip] = useState(0);
+  const [showCostCalculator, setShowCostCalculator] = useState(false);
+  const [treatmentCosts, setTreatmentCosts] = useState({
+    'Root Canal': { min: 5000, max: 15000 },
+    'Teeth Whitening': { min: 8000, max: 25000 },
+    'Dental Crowns': { min: 7000, max: 20000 },
+    'Dental Implants': { min: 25000, max: 50000 },
+    'Smile Design': { min: 30000, max: 80000 },
+    'Emergency Care': { min: 2000, max: 10000 },
+    'Pediatric Dentistry': { min: 1000, max: 5000 },
+    'Digital X-Ray': { min: 500, max: 2000 }
+  });
   const sectionRef = useRef(null);
+
+  // Dental health tips
+  const dentalTips = [
+    "Brush your teeth twice a day for 2 minutes",
+    "Replace your toothbrush every 3-4 months",
+    "Don't forget to clean your tongue",
+    "Limit sugary foods and drinks",
+    "Visit your dentist every 6 months",
+    "Use fluoride toothpaste for better protection",
+    "Floss daily to remove plaque between teeth",
+    "Drink water after meals to wash away acids"
+  ];
+
+  // Mock reviews
+  const mockReviews = [
+    { name: "Rajesh Kumar", rating: 5, comment: "Best dental care in Mumbai! Very professional.", date: "2 days ago" },
+    { name: "Priya Singh", rating: 5, comment: "Painless treatment. Highly recommended!", date: "1 week ago" },
+    { name: "Amit Patel", rating: 5, comment: "Dr. Prity is very experienced and caring.", date: "2 weeks ago" }
+  ];
 
   // Service icons data
   const services = [
@@ -29,6 +69,29 @@ const Hero = () => {
   // Text animation effect
   useEffect(() => {
     setShowText(true);
+    
+    // Set available slots (mock data)
+    setAvailableSlots(['10:30 AM', '11:45 AM', '2:15 PM', '4:30 PM']);
+    
+    // Set recent reviews
+    setRecentReviews(mockReviews);
+    
+    // Check if it's emergency hours (after 8 PM)
+    const currentHour = new Date().getHours();
+    setShowEmergencyBanner(currentHour >= 20 || currentHour <= 6);
+    
+    // Rotate dental tips every 10 seconds
+    const tipInterval = setInterval(() => {
+      setCurrentTip(prev => (prev + 1) % dentalTips.length);
+    }, 10000);
+    
+    // Show quiz after 30 seconds
+    const quizTimer = setTimeout(() => setShowQuiz(true), 30000);
+    
+    return () => {
+      clearInterval(tipInterval);
+      clearTimeout(quizTimer);
+    };
   }, []);
 
   // Count-up animation when in viewport
@@ -66,9 +129,9 @@ const Hero = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Handlers for button clicks - ALL CLICKABLE
+  // Handlers
   const handleBookAppointment = () => {
-    window.location.href = '/appointment'; // Replace with actual link
+    window.location.href = '/appointment';
   };
 
   const handleWhatsApp = () => {
@@ -80,11 +143,16 @@ const Hero = () => {
   };
 
   const handleServiceClick = (service) => {
-    window.location.href = `/services/${service.toLowerCase().replace(/\s+/g, '-')}`;
+    setSelectedTreatment(service);
+    setShowCostCalculator(true);
   };
 
   const handleTrustBadgeClick = (badge) => {
-    window.location.href = `/certifications/${badge.toLowerCase().replace(/\s+/g, '-')}`;
+    if (badge === "Insurance Accepted") {
+      setShowInsuranceCheck(true);
+    } else {
+      window.location.href = `/certifications/${badge.toLowerCase().replace(/\s+/g, '-')}`;
+    }
   };
 
   const handlePhoneClick = () => {
@@ -99,27 +167,92 @@ const Hero = () => {
     window.open('https://maps.google.com/?q=Mumbai+Dental+Clinic', '_blank');
   };
 
+  const handleInsuranceCheck = () => {
+    // Mock insurance verification
+    const providers = ['medibank', 'bupa', 'hcf', 'nib'];
+    const isAccepted = providers.includes(insuranceProvider.toLowerCase());
+    setInsuranceResult({
+      accepted: isAccepted,
+      message: isAccepted ? '✓ Your insurance is accepted!' : '✗ Please contact us for verification',
+      coverage: isAccepted ? 'Up to 70% coverage' : 'May have partial coverage'
+    });
+  };
+
+  const handleEmergencyCall = () => {
+    window.location.href = 'tel:+911234567890';
+  };
+
+  const handleQuizAnswer = (answer) => {
+    // Handle quiz answers
+    setShowQuiz(false);
+    // Show personalized recommendation
+    alert(`Based on your answers, we recommend a dental checkup! Book now for special discount.`);
+  };
+
   return (
     <div className="w-full">
+      {/* EMERGENCY BANNER */}
+      {showEmergencyBanner && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4 animate-slideDown">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center">
+                <span className="text-2xl mr-3">🚨</span>
+                <p className="text-red-700 font-medium">
+                  Emergency? Our 24/7 dental emergency service is available now!
+                </p>
+              </div>
+              <button
+                onClick={handleEmergencyCall}
+                className="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition-colors font-semibold flex items-center gap-2"
+              >
+                <span>📞</span>
+                <span>Call Emergency</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DENTAL HEALTH TIPS CAROUSEL */}
+      <div className="bg-teal-50 py-2 border-b border-teal-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center gap-3">
+            <span className="text-teal-600 font-medium">💡 Dental Tip:</span>
+            <p className="text-gray-700 animate-fadeIn">{dentalTips[currentTip]}</p>
+          </div>
+        </div>
+      </div>
+
       {/* MAIN HERO SECTION */}
       <section ref={sectionRef} className="relative bg-gradient-to-br from-[#F8FAFC] via-white to-[#F8FAFC] py-16 md:py-20 lg:py-24 overflow-hidden">
-        {/* SIMPLE CLEAN BACKGROUND */}
-        <div className="absolute inset-0 bg-white"></div>
+        {/* ... (keep existing background code) ... */}
         
-        {/* Subtle gradient overlay for depth */}
+        <div className="absolute inset-0 bg-white"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-teal-50/30 via-transparent to-transparent"></div>
 
-        {/* Content container - max-w-7xl */}
+        {/* Content container */}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
             
-            {/* LEFT COLUMN - 60% width */}
+            {/* LEFT COLUMN */}
             <div className={`space-y-6 transition-all duration-1000 ${showText ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
               
               {/* Badge/Tagline */}
               <div className="inline-flex items-center bg-teal-50 text-teal-700 px-4 py-2 rounded-full text-sm font-semibold animate-slideInLeft">
                 <span className="mr-1">✨</span> Trusted Dental Care Since 2010
               </div>
+
+              {/* AVAILABLE SLOTS INDICATOR */}
+              {availableSlots.length > 0 && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 animate-pulse">
+                  <p className="text-green-700 text-sm flex items-center gap-2">
+                    <span className="text-green-500">✅</span>
+                    <span className="font-medium">{availableSlots.length} slots available today:</span>
+                    <span className="text-green-600">{availableSlots.join(' • ')}</span>
+                  </p>
+                </div>
+              )}
 
               {/* Main Headline */}
               <h1 className="space-y-2">
@@ -167,7 +300,7 @@ const Hero = () => {
                 </div>
               </div>
 
-              {/* Service Icons Grid - 2x4 */}
+              {/* Service Icons Grid - with cost calculator trigger */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-4">
                 {services.map((service, index) => (
                   <button
@@ -180,6 +313,7 @@ const Hero = () => {
                       <span className="group-hover:text-white transition-colors duration-300">{service.icon}</span>
                     </div>
                     <span className="text-xs font-semibold text-gray-700 mt-2 group-hover:text-teal-600">{service.name}</span>
+                    <span className="text-[10px] text-gray-400 mt-1">Click for cost</span>
                   </button>
                 ))}
               </div>
@@ -190,21 +324,18 @@ const Hero = () => {
                 <button
                   onClick={handleBookAppointment}
                   className="group relative bg-gradient-to-r from-[#0D9488] to-[#14B8A6] text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-teal-400/50 text-lg flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-                  aria-label="Book an appointment"
                 >
                   <span className="text-xl">📅</span>
                   <span>Book Appointment</span>
-                  <span className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
                 </button>
 
-                {/* Secondary Button - WhatsApp Consultation */}
+                {/* Secondary Button - WhatsApp Consultation with Modal */}
                 <button
-                  onClick={handleWhatsApp}
+                  onClick={() => setShowConsultModal(true)}
                   className="group relative border-2 border-[#0D9488] text-[#0D9488] px-8 py-4 rounded-full font-semibold hover:bg-teal-50/50 transition-all duration-300 hover:scale-105 text-lg flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-                  aria-label="Start WhatsApp consultation"
                 >
                   <span className="text-xl">💬</span>
-                  <span>WhatsApp Consultation</span>
+                  <span>Free Consultation</span>
                 </button>
 
                 {/* Tertiary Button - Virtual Tour */}
@@ -217,7 +348,7 @@ const Hero = () => {
                 </button>
               </div>
 
-              {/* Trust Badges - Horizontal scroll on mobile */}
+              {/* Trust Badges */}
               <div className="flex overflow-x-auto pb-2 gap-2 no-scrollbar">
                 {trustBadges.map((badge, index) => (
                   <button
@@ -229,15 +360,26 @@ const Hero = () => {
                   </button>
                 ))}
               </div>
+
+              {/* PAYMENT OPTIONS */}
+              <div className="flex items-center gap-4 mt-2">
+                <span className="text-sm text-gray-500">Pay with:</span>
+                <div className="flex gap-3">
+                  <span className="text-xl">💳</span>
+                  <span className="text-xl">📱</span>
+                  <span className="text-xl">🏦</span>
+                  <span className="text-sm text-gray-400 ml-2">+ all major cards & UPI</span>
+                </div>
+              </div>
             </div>
 
-            {/* RIGHT COLUMN - 40% width */}
+            {/* RIGHT COLUMN - with reviews widget */}
             <div className={`relative transition-all duration-1000 delay-500 ${showText ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
               
-              {/* Main Visual Container - CLEAN WHITE BACKGROUND */}
+              {/* Main Visual Container */}
               <div className="relative bg-white rounded-3xl p-4 shadow-2xl shadow-gray-200/50">
+                {/* ... (keep existing image container code) ... */}
                 
-                {/* Inner container */}
                 <div className="relative rounded-2xl overflow-hidden">
                   {/* Doctor Portrait */}
                   <div className="relative animate-float">
@@ -246,18 +388,13 @@ const Hero = () => {
                       alt="Dr. Prity Raushan - Dental Expert"
                       className="w-full h-auto object-cover rounded-2xl border-4 border-white shadow-2xl"
                     />
-                    
-                    {/* Soft overlay for depth */}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0A2540]/20 via-transparent to-transparent rounded-2xl"></div>
                   </div>
 
-                  {/* Floating Elements - Badges - ALL CLICKABLE */}
-                  
-                  {/* Top Right - Years Badge */}
+                  {/* Floating Elements - Badges */}
                   <button 
                     onClick={() => window.location.href = '/about'}
                     className="absolute -top-4 -right-4 bg-white rounded-2xl shadow-xl p-3 border-l-4 border-[#0D9488] animate-float z-20 hover:shadow-2xl transition-all"
-                    aria-label="View doctor experience"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-2xl">⭐</span>
@@ -268,11 +405,9 @@ const Hero = () => {
                     </div>
                   </button>
 
-                  {/* Bottom Left - Smiles Badge */}
                   <button 
                     onClick={() => window.location.href = '/testimonials'}
                     className="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-xl p-3 border-l-4 border-[#14B8A6] animate-float animation-delay-500 z-20 hover:shadow-2xl transition-all"
-                    aria-label="View patient testimonials"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-2xl">😊</span>
@@ -282,40 +417,12 @@ const Hero = () => {
                       </div>
                     </div>
                   </button>
-
-                  {/* Middle Right - Rating Badge */}
-                  <button 
-                    onClick={() => window.open('https://google.com/reviews', '_blank')}
-                    className="absolute top-1/2 -right-4 transform -translate-y-1/2 bg-white rounded-2xl shadow-xl p-3 border-l-4 border-[#0D9488] animate-float animation-delay-1000 z-20 hidden lg:block hover:shadow-2xl transition-all"
-                    aria-label="View Google reviews"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">★★★★★</span>
-                      <div>
-                        <div className="font-bold text-[#0A2540]">5.0 Rating</div>
-                        <div className="text-xs text-gray-500">Google Reviews</div>
-                      </div>
-                    </div>
-                  </button>
-
-                  {/* Bottom Right - Painless Badge */}
-                  <button 
-                    onClick={() => window.location.href = '/treatments'}
-                    className="absolute -bottom-2 -right-2 bg-white rounded-full shadow-lg p-2 animate-float animation-delay-1500 z-20 hover:shadow-xl transition-all"
-                    aria-label="View painless treatments"
-                  >
-                    <div className="flex items-center gap-1 text-sm">
-                      <span className="text-green-500">✓</span>
-                      <span className="font-medium text-[#0A2540]">Painless</span>
-                    </div>
-                  </button>
                 </div>
 
                 {/* Video Tour Thumbnail */}
                 <button
                   onClick={handleVirtualTour}
                   className="absolute -bottom-6 left-6 flex items-center gap-3 bg-white rounded-2xl shadow-xl p-3 hover:shadow-2xl transition-all duration-300 group z-30"
-                  aria-label="Watch clinic tour video"
                 >
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#0D9488] to-[#14B8A6] flex items-center justify-center text-white group-hover:scale-110 transition-transform">
                     <span className="text-xl">▶</span>
@@ -327,8 +434,35 @@ const Hero = () => {
                 </button>
               </div>
 
-              {/* Social Proof Strip - CLICKABLE LOGOS */}
-              <div className="mt-12 text-center">
+              {/* RECENT REVIEWS WIDGET */}
+              <div className="mt-8 bg-white rounded-xl shadow-lg p-4">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                  <span>⭐</span> Recent Google Reviews
+                </h3>
+                <div className="space-y-3">
+                  {recentReviews.map((review, index) => (
+                    <div key={index} className="border-b border-gray-100 last:border-0 pb-2 last:pb-0">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-sm">{review.name}</span>
+                        <span className="text-xs text-gray-400">{review.date}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-yellow-400 text-sm">
+                        {'★'.repeat(review.rating)}
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1">{review.comment}</p>
+                    </div>
+                  ))}
+                </div>
+                <button 
+                  onClick={() => window.open('https://google.com/reviews', '_blank')}
+                  className="text-xs text-teal-600 mt-3 hover:underline block"
+                >
+                  See all reviews →
+                </button>
+              </div>
+
+              {/* Social Proof Strip */}
+              <div className="mt-6 text-center">
                 <p className="text-sm text-gray-500 mb-3">Trusted by leading health funds</p>
                 <div className="flex justify-center items-center gap-6">
                   <button onClick={() => window.open('https://medibank.com.au', '_blank')} className="text-xl font-bold text-gray-500 hover:text-[#0D9488] transition-colors">MEDIBANK</button>
@@ -342,7 +476,7 @@ const Hero = () => {
         </div>
       </section>
 
-      {/* QUICK CONTACT BAR - ALL CLICKABLE */}
+      {/* QUICK CONTACT BAR */}
       <div className="bg-white shadow-md border-t border-gray-100 py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-sm">
@@ -365,6 +499,202 @@ const Hero = () => {
           </div>
         </div>
       </div>
+
+      {/* CONSULTATION MODAL */}
+      {showConsultModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 animate-slideUp">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-[#0A2540]">Free Consultation</h3>
+              <button 
+                onClick={() => setShowConsultModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <p className="text-gray-600">Choose your preferred consultation method:</p>
+              
+              <button
+                onClick={handleWhatsApp}
+                className="w-full bg-green-500 text-white p-4 rounded-xl hover:bg-green-600 transition-colors flex items-center justify-center gap-2 font-semibold"
+              >
+                <span>💬</span> WhatsApp Chat
+              </button>
+              
+              <button
+                onClick={() => {
+                  setShowConsultModal(false);
+                  window.location.href = 'tel:+911234567890';
+                }}
+                className="w-full bg-blue-500 text-white p-4 rounded-xl hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 font-semibold"
+              >
+                <span>📞</span> Phone Call
+              </button>
+              
+              <button
+                onClick={() => {
+                  setShowConsultModal(false);
+                  handleBookAppointment();
+                }}
+                className="w-full bg-teal-600 text-white p-4 rounded-xl hover:bg-teal-700 transition-colors flex items-center justify-center gap-2 font-semibold"
+              >
+                <span>📹</span> Video Consultation
+              </button>
+              
+              <p className="text-xs text-gray-400 text-center mt-4">
+                We'll respond within 5 minutes during working hours
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* INSURANCE CHECK MODAL */}
+      {showInsuranceCheck && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 animate-slideUp">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-[#0A2540]">Check Insurance Coverage</h3>
+              <button 
+                onClick={() => {
+                  setShowInsuranceCheck(false);
+                  setInsuranceResult(null);
+                  setInsuranceProvider('');
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <p className="text-gray-600">Enter your insurance provider name:</p>
+              
+              <input
+                type="text"
+                value={insuranceProvider}
+                onChange={(e) => setInsuranceProvider(e.target.value)}
+                placeholder="e.g., Medibank, BUPA, HCF"
+                className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+              />
+              
+              <button
+                onClick={handleInsuranceCheck}
+                className="w-full bg-teal-600 text-white p-3 rounded-xl hover:bg-teal-700 transition-colors font-semibold"
+              >
+                Check Coverage
+              </button>
+              
+              {insuranceResult && (
+                <div className={`p-4 rounded-xl ${insuranceResult.accepted ? 'bg-green-50' : 'bg-yellow-50'}`}>
+                  <p className={`font-semibold ${insuranceResult.accepted ? 'text-green-700' : 'text-yellow-700'}`}>
+                    {insuranceResult.message}
+                  </p>
+                  {insuranceResult.accepted && (
+                    <p className="text-sm text-green-600 mt-1">{insuranceResult.coverage}</p>
+                  )}
+                </div>
+              )}
+              
+              <p className="text-xs text-gray-400 text-center">
+                We accept all major insurance providers
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TREATMENT COST CALCULATOR MODAL */}
+      {showCostCalculator && selectedTreatment && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 animate-slideUp">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-[#0A2540]">{selectedTreatment} Cost Estimate</h3>
+              <button 
+                onClick={() => {
+                  setShowCostCalculator(false);
+                  setSelectedTreatment(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="bg-teal-50 p-4 rounded-xl">
+                <p className="text-sm text-gray-600">Estimated Price Range:</p>
+                <p className="text-3xl font-bold text-teal-600">
+                  ₹{treatmentCosts[selectedTreatment]?.min.toLocaleString()} - ₹{treatmentCosts[selectedTreatment]?.max.toLocaleString()}
+                </p>
+              </div>
+              
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-700">Payment Options:</h4>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-green-500">✓</span> 0% EMI available
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-green-500">✓</span> Insurance coverage applicable
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-green-500">✓</span> Flexible payment plans
+                </div>
+              </div>
+              
+              <button
+                onClick={handleBookAppointment}
+                className="w-full bg-gradient-to-r from-[#0D9488] to-[#14B8A6] text-white p-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+              >
+                Book Consultation for Exact Quote
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DENTAL HEALTH QUIZ POPUP */}
+      {showQuiz && (
+        <div className="fixed bottom-4 right-4 bg-white rounded-2xl shadow-2xl max-w-sm w-full p-4 animate-slideUp z-40 border-l-4 border-teal-500">
+          <button 
+            onClick={() => setShowQuiz(false)}
+            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+          >
+            ✕
+          </button>
+          
+          <h4 className="font-bold text-[#0A2540] mb-2">Quick Dental Health Check</h4>
+          <p className="text-sm text-gray-600 mb-3">How often do you visit the dentist?</p>
+          
+          <div className="space-y-2">
+            <button
+              onClick={() => handleQuizAnswer('regular')}
+              className="w-full text-left p-2 hover:bg-teal-50 rounded-lg transition-colors text-sm"
+            >
+              Every 6 months
+            </button>
+            <button
+              onClick={() => handleQuizAnswer('yearly')}
+              className="w-full text-left p-2 hover:bg-teal-50 rounded-lg transition-colors text-sm"
+            >
+              Once a year
+            </button>
+            <button
+              onClick={() => handleQuizAnswer('rarely')}
+              className="w-full text-left p-2 hover:bg-teal-50 rounded-lg transition-colors text-sm"
+            >
+              Only when in pain
+            </button>
+          </div>
+          
+          <p className="text-[10px] text-gray-400 mt-3">
+            Take 10 seconds to get personalized dental advice
+          </p>
+        </div>
+      )}
 
       {/* CUSTOM CSS ANIMATIONS */}
       <style>{`
@@ -409,12 +739,36 @@ const Hero = () => {
           animation: slideUp 0.8s ease-out forwards;
         }
 
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slideDown {
+          animation: slideDown 0.5s ease-out forwards;
+        }
+
         @keyframes countUp {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
         .animate-countUp {
           animation: countUp 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.7; }
+        }
+        .animate-pulse {
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
 
         /* Animation delays */
@@ -453,4 +807,4 @@ const Hero = () => {
   )
 }
 
-export default Hero
+export default Hero;
