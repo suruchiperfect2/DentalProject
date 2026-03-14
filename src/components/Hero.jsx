@@ -14,6 +14,7 @@ const Hero = () => {
   const [recentReviews, setRecentReviews] = useState([]);
   const [currentTip, setCurrentTip] = useState(0);
   const [showCostCalculator, setShowCostCalculator] = useState(false);
+  const [activeFaq, setActiveFaq] = useState(null);
   const [treatmentCosts, setTreatmentCosts] = useState({
     'Root Canal': { min: 5000, max: 15000 },
     'Teeth Whitening': { min: 8000, max: 25000 },
@@ -38,11 +39,172 @@ const Hero = () => {
     "Drink water after meals to wash away acids"
   ];
 
-  // Mock reviews
-  const mockReviews = [
-    { name: "Rajesh Kumar", rating: 5, comment: "Best dental care in Mumbai! Very professional.", date: "2 days ago" },
-    { name: "Priya Singh", rating: 5, comment: "Painless treatment. Highly recommended!", date: "1 week ago" },
-    { name: "Amit Patel", rating: 5, comment: "Dr. Prity is very experienced and caring.", date: "2 weeks ago" }
+  // Safety features data
+  const safetyFeatures = [
+    {
+      icon: "🧼",
+      title: "Sterilized Equipment",
+      description: "All instruments undergo hospital-grade sterilization after every use"
+    },
+    {
+      icon: "😷",
+      title: "PPE Kits",
+      description: "Full protective gear for all staff members during procedures"
+    },
+    {
+      icon: "🌡️",
+      title: "Temperature Screening",
+      description: "Regular health checks for all patients and staff"
+    },
+    {
+      icon: "🧴",
+      title: "Sanitization Stations",
+      description: "Hand sanitizers available throughout the clinic"
+    },
+    {
+      icon: "💨",
+      title: "HEPA Air Purifiers",
+      description: "Advanced air filtration systems in all treatment rooms"
+    },
+    {
+      icon: "🧪",
+      title: "Disposable Materials",
+      description: "Single-use materials to prevent cross-contamination"
+    }
+  ];
+
+  // Dentist expertise data
+  const dentistExpertise = [
+    {
+      name: "Dr. Prity Raushan",
+      qualification: "BDS, MDS (Prosthodontist)",
+      experience: "15+ Years",
+      speciality: "Cosmetic & Implant Dentistry",
+      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      achievements: ["1000+ Implants", "5000+ Smiles", "Gold Medalist"]
+    },
+    {
+      name: "Dr. Rajesh Kumar",
+      qualification: "BDS, MDS (Orthodontist)",
+      experience: "12+ Years",
+      speciality: "Braces & Aligners",
+      image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      achievements: ["2000+ Braces Cases", "Invisalign Certified", "Smile Design Expert"]
+    },
+    {
+      name: "Dr. Priya Sharma",
+      qualification: "BDS, MDS (Pedodontist)",
+      experience: "10+ Years",
+      speciality: "Child Dentistry",
+      image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      achievements: ["Child Specialist", "Pain-Free Techniques", "Behavior Management"]
+    }
+  ];
+
+  // Why trust us data
+  const trustFactors = [
+    {
+      icon: "🏆",
+      title: "10+ Years Experience",
+      description: "Decade of excellence in dental care"
+    },
+    {
+      icon: "👥",
+      title: "5000+ Happy Patients",
+      description: "Trusted by thousands of families"
+    },
+    {
+      icon: "🔬",
+      title: "Advanced Technology",
+      description: "Latest dental equipment and techniques"
+    },
+    {
+      icon: "⭐",
+      title: "5-Star Rating",
+      description: "Excellent patient reviews and feedback"
+    },
+    {
+      icon: "🦷",
+      title: "Specialized Care",
+      description: "Treatment by specialist doctors"
+    },
+    {
+      icon: "💯",
+      title: "Painless Treatments",
+      description: "Comfortable and gentle procedures"
+    }
+  ];
+
+  // Patient testimonials
+  const testimonials = [
+    {
+      name: "Rajesh Kumar",
+      location: "Mumbai",
+      rating: 5,
+      comment: "Best dental experience ever! Dr. Prity is very professional and caring. The clinic is ultra-modern and hygienic.",
+      date: "2 days ago",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+    },
+    {
+      name: "Priya Singh",
+      location: "Andheri",
+      rating: 5,
+      comment: "I was scared of dental treatments, but the team made me feel comfortable. Painless root canal! Highly recommended.",
+      date: "1 week ago",
+      image: "https://images.unsplash.com/photo-1494790108777-7667a7e6b4b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+    },
+    {
+      name: "Amit Patel",
+      location: "Bandra",
+      rating: 5,
+      comment: "Great clinic with friendly staff. Got my dental implants done here. Very reasonable pricing and excellent care.",
+      date: "2 weeks ago",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+    },
+    {
+      name: "Sneha Reddy",
+      location: "Powai",
+      rating: 5,
+      comment: "My kids love coming here! The pediatric dentist is amazing with children. Very patient and gentle.",
+      date: "3 weeks ago",
+      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+    }
+  ];
+
+  // FAQ data
+  const faqs = [
+    {
+      question: "Is dental treatment painful?",
+      answer: "We use modern pain management techniques including local anesthesia, sedation options, and gentle techniques to ensure your comfort. Most patients report little to no discomfort during procedures."
+    },
+    {
+      question: "How often should I visit the dentist?",
+      answer: "We recommend a dental check-up and cleaning every 6 months for optimal oral health. However, frequency may vary based on your individual needs and risk factors."
+    },
+    {
+      question: "Do you accept insurance?",
+      answer: "Yes, we accept all major insurance providers including Mediclaim, and we'll help you maximize your benefits. Our team can assist with insurance claims and paperwork."
+    },
+    {
+      question: "What payment options do you offer?",
+      answer: "We accept cash, all major credit/debit cards, UPI payments, and offer 0% EMI options for larger treatments. We also have flexible payment plans."
+    },
+    {
+      question: "How do I book an appointment?",
+      answer: "You can book online through our website, call us directly, or use WhatsApp for quick appointment scheduling. We offer flexible timings including weekends."
+    },
+    {
+      question: "What safety measures do you follow?",
+      answer: "We follow strict sterilization protocols, use disposable materials, have HEPA air purifiers, and all staff wear PPE. Your safety is our top priority."
+    },
+    {
+      question: "Do you handle dental emergencies?",
+      answer: "Yes, we have 24/7 emergency dental services. Call our emergency number for immediate assistance with tooth pain, broken teeth, or other dental emergencies."
+    },
+    {
+      question: "What is the cost of treatment?",
+      answer: "Costs vary based on treatment complexity. We provide transparent pricing and a detailed estimate before starting any procedure. Ask about our EMI options."
+    }
   ];
 
   // Service icons data
@@ -74,7 +236,7 @@ const Hero = () => {
     setAvailableSlots(['10:30 AM', '11:45 AM', '2:15 PM', '4:30 PM']);
     
     // Set recent reviews
-    setRecentReviews(mockReviews);
+    setRecentReviews(testimonials.slice(0, 3));
     
     // Check if it's emergency hours (after 8 PM)
     const currentHour = new Date().getHours();
@@ -169,12 +331,12 @@ const Hero = () => {
 
   const handleInsuranceCheck = () => {
     // Mock insurance verification
-    const providers = ['medibank', 'bupa', 'hcf', 'nib'];
+    const providers = ['medibank', 'bupa', 'hcf', 'nib', 'icici', 'hdfc', 'star health'];
     const isAccepted = providers.includes(insuranceProvider.toLowerCase());
     setInsuranceResult({
       accepted: isAccepted,
       message: isAccepted ? '✓ Your insurance is accepted!' : '✗ Please contact us for verification',
-      coverage: isAccepted ? 'Up to 70% coverage' : 'May have partial coverage'
+      coverage: isAccepted ? 'Up to 80% coverage' : 'May have partial coverage'
     });
   };
 
@@ -183,10 +345,12 @@ const Hero = () => {
   };
 
   const handleQuizAnswer = (answer) => {
-    // Handle quiz answers
     setShowQuiz(false);
-    // Show personalized recommendation
     alert(`Based on your answers, we recommend a dental checkup! Book now for special discount.`);
+  };
+
+  const toggleFaq = (index) => {
+    setActiveFaq(activeFaq === index ? null : index);
   };
 
   return (
@@ -226,8 +390,6 @@ const Hero = () => {
 
       {/* MAIN HERO SECTION */}
       <section ref={sectionRef} className="relative bg-gradient-to-br from-[#F8FAFC] via-white to-[#F8FAFC] py-16 md:py-20 lg:py-24 overflow-hidden">
-        {/* ... (keep existing background code) ... */}
-        
         <div className="absolute inset-0 bg-white"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-teal-50/30 via-transparent to-transparent"></div>
 
@@ -373,13 +535,11 @@ const Hero = () => {
               </div>
             </div>
 
-            {/* RIGHT COLUMN - with reviews widget */}
+            {/* RIGHT COLUMN */}
             <div className={`relative transition-all duration-1000 delay-500 ${showText ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
               
               {/* Main Visual Container */}
               <div className="relative bg-white rounded-3xl p-4 shadow-2xl shadow-gray-200/50">
-                {/* ... (keep existing image container code) ... */}
-                
                 <div className="relative rounded-2xl overflow-hidden">
                   {/* Doctor Portrait */}
                   <div className="relative animate-float">
@@ -472,6 +632,260 @@ const Hero = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SAFETY FIRST SECTION */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="inline-block bg-teal-100 text-teal-700 px-4 py-2 rounded-full text-sm font-semibold mb-4">
+              Your Safety is Our Priority
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0A2540] mb-4">
+              Highest Standards of <span className="text-teal-600">Sterilization & Safety</span>
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              We follow international safety protocols to ensure your health and well-being
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {safetyFeatures.map((feature, index) => (
+              <div key={index} className="bg-teal-50 rounded-xl p-6 hover:shadow-lg transition-all duration-300 group">
+                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">{feature.icon}</div>
+                <h3 className="text-lg font-semibold text-[#0A2540] mb-2">{feature.title}</h3>
+                <p className="text-gray-600 text-sm">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Safety Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-teal-600">100%</div>
+              <div className="text-sm text-gray-600">Sterilized Equipment</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-teal-600">24/7</div>
+              <div className="text-sm text-gray-600">Monitoring</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-teal-600">Zero</div>
+              <div className="text-sm text-gray-600">Cross-Infection</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-teal-600">ISO</div>
+              <div className="text-sm text-gray-600">Certified</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* EXPERTISE OF OUR DENTISTS SECTION */}
+      <section className="py-16 bg-gradient-to-b from-teal-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="inline-block bg-teal-100 text-teal-700 px-4 py-2 rounded-full text-sm font-semibold mb-4">
+              Meet Our Experts
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0A2540] mb-4">
+              Expertise That <span className="text-teal-600">You Can Trust</span>
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Our team of specialized dentists with years of experience and advanced qualifications
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {dentistExpertise.map((dentist, index) => (
+              <div key={index} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group">
+                <div className="relative h-64 overflow-hidden">
+                  <img 
+                    src={dentist.image} 
+                    alt={dentist.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <div className="font-bold text-xl">{dentist.name}</div>
+                    <div className="text-sm opacity-90">{dentist.speciality}</div>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <div className="flex items-center gap-2 text-teal-600 mb-3">
+                    <span className="text-sm font-semibold bg-teal-50 px-3 py-1 rounded-full">{dentist.qualification}</span>
+                    <span className="text-sm bg-gray-100 px-3 py-1 rounded-full">{dentist.experience}</span>
+                  </div>
+                  <div className="space-y-2">
+                    {dentist.achievements.map((achievement, i) => (
+                      <div key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className="text-teal-500">✓</span>
+                        {achievement}
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={handleBookAppointment}
+                    className="mt-4 w-full bg-teal-50 text-teal-700 py-2 rounded-lg hover:bg-teal-100 transition-colors font-semibold"
+                  >
+                    Book Appointment
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* WHY TRUST US SECTION */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="inline-block bg-teal-100 text-teal-700 px-4 py-2 rounded-full text-sm font-semibold mb-4">
+              Why Trust Us
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0A2540] mb-4">
+              Reasons to Choose <span className="text-teal-600">Dr. Prity's Dental</span>
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              We combine expertise, technology, and compassion to give you the best dental care
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {trustFactors.map((factor, index) => (
+              <div key={index} className="relative bg-gradient-to-br from-white to-teal-50 rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border border-teal-100 group">
+                <div className="absolute -top-3 -right-3 w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg">
+                  {index + 1}
+                </div>
+                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">{factor.icon}</div>
+                <h3 className="text-lg font-semibold text-[#0A2540] mb-2">{factor.title}</h3>
+                <p className="text-gray-600 text-sm">{factor.description}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Trust Badge with Image */}
+          <div className="mt-12 bg-teal-600 rounded-2xl overflow-hidden">
+            <div className="grid md:grid-cols-2">
+              <div className="p-8 text-white">
+                <h3 className="text-2xl font-bold mb-4">10+ Years of Trust</h3>
+                <p className="mb-6 opacity-90">Join thousands of happy patients who have experienced the best dental care in Mumbai.</p>
+                <div className="flex items-center gap-4">
+                  <div className="flex -space-x-2">
+                    <img src="https://images.unsplash.com/photo-1494790108777-7667a7e6b4b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=40&h=40&q=80" className="w-10 h-10 rounded-full border-2 border-white" />
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=40&h=40&q=80" className="w-10 h-10 rounded-full border-2 border-white" />
+                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=40&h=40&q=80" className="w-10 h-10 rounded-full border-2 border-white" />
+                  </div>
+                  <span className="text-sm">5000+ Happy Patients</span>
+                </div>
+              </div>
+              <div className="h-48 md:h-auto bg-cover bg-center" style={{
+                backgroundImage: "url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')"
+              }}></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PATIENT TESTIMONIALS SECTION */}
+      <section className="py-16 bg-gradient-to-b from-teal-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="inline-block bg-teal-100 text-teal-700 px-4 py-2 rounded-full text-sm font-semibold mb-4">
+              Patient Speaks
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0A2540] mb-4">
+              What Our <span className="text-teal-600">Patients Say</span>
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Real stories from real patients who trusted us with their smiles
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {testimonials.map((testimonial, index) => (
+              <div key={index} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                <div className="flex items-start gap-4">
+                  <img 
+                    src={testimonial.image} 
+                    alt={testimonial.name}
+                    className="w-16 h-16 rounded-full object-cover border-2 border-teal-500"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold text-[#0A2540]">{testimonial.name}</h3>
+                      <span className="text-xs text-gray-400">{testimonial.date}</span>
+                    </div>
+                    <p className="text-sm text-gray-500 mb-2">{testimonial.location}</p>
+                    <div className="flex items-center gap-1 text-yellow-400 mb-2">
+                      {'★'.repeat(testimonial.rating)}
+                    </div>
+                    <p className="text-gray-600 text-sm">"{testimonial.comment}"</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <button 
+              onClick={() => window.open('https://google.com/reviews', '_blank')}
+              className="inline-flex items-center gap-2 bg-white text-teal-600 px-6 py-3 rounded-full font-semibold border-2 border-teal-600 hover:bg-teal-50 transition-colors"
+            >
+              <span>⭐</span>
+              Read All Reviews on Google
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* FREQUENTLY ASKED QUESTIONS SECTION */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="inline-block bg-teal-100 text-teal-700 px-4 py-2 rounded-full text-sm font-semibold mb-4">
+              Got Questions?
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0A2540] mb-4">
+              Frequently Asked <span className="text-teal-600">Questions</span>
+            </h2>
+            <p className="text-gray-600">
+              Find answers to common questions about our dental services
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <div key={index} className="border border-gray-200 rounded-xl overflow-hidden">
+                <button
+                  onClick={() => toggleFaq(index)}
+                  className="w-full flex items-center justify-between p-6 text-left bg-white hover:bg-gray-50 transition-colors"
+                >
+                  <span className="font-semibold text-[#0A2540]">{faq.question}</span>
+                  <span className="text-2xl text-teal-600">
+                    {activeFaq === index ? '−' : '+'}
+                  </span>
+                </button>
+                {activeFaq === index && (
+                  <div className="p-6 bg-gray-50 border-t border-gray-200">
+                    <p className="text-gray-600">{faq.answer}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <p className="text-gray-600 mb-4">Still have questions? We're here to help!</p>
+            <button
+              onClick={() => setShowConsultModal(true)}
+              className="bg-gradient-to-r from-[#0D9488] to-[#14B8A6] text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all"
+            >
+              Ask Us Anything
+            </button>
           </div>
         </div>
       </section>
