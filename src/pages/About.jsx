@@ -147,23 +147,23 @@ const About = () => {
   return (
     <div className="font-sans text-gray-700 leading-relaxed overflow-x-hidden">
       {/* Hero Section with Background Image - Smaller optimized image */}
-      <div className="relative h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden">
+      <div className="relative h-[100px] md:h-[300px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src="https://images.pexels.com/photos/3845625/pexels-photo-3845625.jpeg?auto=compress&cs=tinysrgb&w=1200&h=600&fit=crop" 
+            src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=2069&auto=format&fit=crop" 
             alt="Modern Dental Clinic Interior" 
             className="w-full h-full object-cover"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B2B4A]/90 to-[#14b8a6]/70"></div>
+          <div className="absolute inset-0"></div>
         </div>
 
         <div className="relative text-center z-10 px-4">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl text-white uppercase tracking-wider font-light mb-4 animate-float"
+          <h1 className="text-5xl md:text-6xl lg:text-7xl text-teal-700 uppercase tracking-wider font-light mb-4 animate-float"
               style={{textShadow: '0 5px 15px rgba(0,0,0,0.3)'}}>
             About Us
           </h1>
-          <p className="text-lg md:text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl lg:text-2xl text-teal-600 max-w-3xl mx-auto">
             Your Trusted Partner in Dental Excellence & Care
           </p>
           <div className="w-24 h-0.5 bg-teal-400 mx-auto mt-6 rounded-full"></div>
