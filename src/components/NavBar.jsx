@@ -14,7 +14,6 @@ const NavBar = () => {
     { 
       path: "/about", 
       label: "About Us",
-      icon: <Info className="w-4 h-4" />
     },
     { 
       label: "Services", 
@@ -182,8 +181,7 @@ const NavBar = () => {
                                   setActiveDropdown(null);
                                 }}
                               >
-                                <span>View All Services</span>
-                                <ChevronRight className="w-4 h-4" />
+                                
                               </Link>
                             </div>
                           </div>

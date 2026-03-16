@@ -5,6 +5,8 @@ const Appointment = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [formData, setFormData] = useState({
     fullName: "",
+    age: "",
+    gender: "",
     phone: "",
     email: "",
     service: "",
@@ -26,31 +28,37 @@ const Appointment = () => {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [showBookingSummary, setShowBookingSummary] = useState(false);
+  const [networkStatus, setNetworkStatus] = useState(navigator.onLine);
+  const [showOfflineMessage, setShowOfflineMessage] = useState(false);
 
   // Updated images with dental/medical theme
   const slides = [
-    {
-      image: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?ixlib=rb-4.0.3&auto=format&fit=crop&w=2068&q=80",
-      title: "Modern Dental Care",
-      quote: "Experience the future of dentistry today"
-    },
-    
-    {
-      image: "https://images.unsplash.com/photo-1609840114035-3c981b782dfe?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
-      title: "Expert Specialists",
-      quote: "Your smile is in safe hands"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
-      title: "Pain-Free Treatments",
-      quote: "Comfortable care for every patient"
-    },
     {
       image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
       title: "Beautiful Smiles",
       quote: "Transform your smile today"
     }
   ];
+
+  // Monitor network status
+  useEffect(() => {
+    const handleOnline = () => {
+      setNetworkStatus(true);
+      setShowOfflineMessage(false);
+    };
+    const handleOffline = () => {
+      setNetworkStatus(false);
+      setShowOfflineMessage(true);
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   // Intersection Observer for scroll animations
   useEffect(() => {
@@ -193,6 +201,14 @@ const Appointment = () => {
     }
   ];
 
+  // Gender options
+  const genders = [
+    { value: "male", label: "Male" },
+    { value: "female", label: "Female" },
+    { value: "other", label: "Other" },
+    { value: "prefer-not-to-say", label: "Prefer not to say" }
+  ];
+
   // Doctors list
   const doctors = [
     { id: "dr-prity", name: "Dr. Prity Raushan", specialization: "Chief Dental Surgeon", experience: "15+ years", image: "👩‍⚕️" },
@@ -233,6 +249,16 @@ const Appointment = () => {
       newErrors.fullName = "Full name is required";
     } else if (formData.fullName.length < 3) {
       newErrors.fullName = "Name must be at least 3 characters";
+    }
+    
+    if (!formData.age) {
+      newErrors.age = "Age is required";
+    } else if (formData.age < 1 || formData.age > 120) {
+      newErrors.age = "Please enter a valid age (1-120)";
+    }
+    
+    if (!formData.gender) {
+      newErrors.gender = "Please select your gender";
     }
     
     if (!formData.phone.trim()) {
@@ -291,6 +317,13 @@ const Appointment = () => {
     return doctors.find(d => d.id === doctorId) || {};
   };
 
+  // Send simple SMS for offline users
+  const sendSimpleSMS = () => {
+    const message = `Appointment Request: ${formData.fullName}, Age:${formData.age}, ${formData.gender}, Phone:${formData.phone}, Service:${formData.service}, Date:${formData.date || 'Not selected'}, Time:${formData.time || 'Not selected'}, Msg:${formData.message || 'None'}`;
+    const smsLink = `sms:+919876543210?body=${encodeURIComponent(message)}`;
+    window.location.href = smsLink;
+  };
+
   // Send detailed WhatsApp message
   const sendWhatsAppConfirmation = () => {
     const serviceDetails = getServiceDetails(formData.service);
@@ -305,6 +338,9 @@ Your dental appointment has been successfully booked. Here are your complete det
 ━━━━━━━━━━━━━━━━━━━━━
 📋 *APPOINTMENT DETAILS*
 ━━━━━━━━━━━━━━━━━━━━━
+👤 *Patient:* ${formData.fullName}
+🎂 *Age:* ${formData.age}
+⚥ *Gender:* ${formData.gender}
 🏥 *Service:* ${formData.service}
 📝 *Description:* ${serviceDetails.description || "N/A"}
 ⏱️ *Duration:* ${serviceDetails.duration || "N/A"}
@@ -376,6 +412,9 @@ Your dental appointment has been successfully booked at Dr. Prity Raushan's Clin
 ══════════════════════════════════════
 APPOINTMENT DETAILS
 ══════════════════════════════════════
+Patient Name: ${formData.fullName}
+Age: ${formData.age}
+Gender: ${formData.gender}
 Service: ${formData.service}
 Description: ${serviceDetails.description || "N/A"}
 Duration: ${serviceDetails.duration || "N/A"}
@@ -454,8 +493,15 @@ Dr. Prity Raushan and Team`;
     window.location.href = smsLink;
   };
 
-  // Handle confirmation based on selected method
+  // Handle confirmation based on selected method and network status
   const handleConfirmations = () => {
+    if (!networkStatus) {
+      // If offline, send simple SMS
+      sendSimpleSMS();
+      setShowOfflineMessage(true);
+      return;
+    }
+
     switch(confirmationMethod) {
       case 'whatsapp':
         if (formData.consentWhatsApp) sendWhatsAppConfirmation();
@@ -507,6 +553,8 @@ Dr. Prity Raushan and Team`;
       // Reset form
       setFormData({
         fullName: "",
+        age: "",
+        gender: "",
         phone: "",
         email: "",
         service: "",
@@ -537,6 +585,13 @@ Dr. Prity Raushan and Team`;
       
       {/* Hero Section with Slideshow - Navy Blue Headings */}
       <div className="relative h-[500px] md:h-[600px] overflow-hidden">
+        {/* Background Heading */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+          <h1 className="text-[12vw] md:text-[10vw] lg:text-[8vw] font-bold text-black/5 whitespace-nowrap select-none transform -rotate-12">
+            APPOINTMENT
+          </h1>
+        </div>
+
         {/* Slides */}
         <div className="relative h-full">
           {slides.map((slide, index) => (
@@ -560,7 +615,7 @@ Dr. Prity Raushan and Team`;
         </div>
 
         {/* Slide Content */}
-        <div className="absolute inset-0 flex items-center">
+        <div className="absolute inset-0 flex items-center z-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
               <span className="inline-block bg-gradient-to-r from-teal-500/30 to-cyan-500/30 backdrop-blur-md px-6 py-2 rounded-full text-sm font-semibold mb-6 border border-white/30 text-white">
@@ -573,7 +628,7 @@ Dr. Prity Raushan and Team`;
                 </span>
               </h1>
               <p className="text-lg md:text-xl text-gray-200 mb-8 italic">
-                                "{slides[currentSlide].quote}"
+                "{slides[currentSlide].quote}"
               </p>
               <div className="flex flex-wrap gap-4">
                 <a
@@ -602,7 +657,7 @@ Dr. Prity Raushan and Team`;
         </div>
 
         {/* Slide Indicators */}
-        <div className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 md:gap-3">
+        <div className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 md:gap-3 z-20">
           {slides.map((_, index) => (
             <button
               key={index}
@@ -673,6 +728,32 @@ Dr. Prity Raushan and Team`;
         </div>
       </div>
 
+      {/* Offline Message Banner */}
+      {showOfflineMessage && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">
+                You are currently offline. Your appointment request will be sent via simple SMS.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowOfflineMessage(false)}
+              className="ml-auto text-yellow-500 hover:text-yellow-600"
+            >
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Appointment Form Section */}
       <section id="booking" className="relative py-12 md:py-16 lg:py-20">
         {/* Background Decorative Elements - Soft Aqua Glow */}
@@ -717,8 +798,10 @@ Dr. Prity Raushan and Team`;
                 <div className="flex-1">
                   <h3 className="text-base md:text-lg font-semibold text-[#0A2540] mb-1">Appointment Confirmed!</h3>
                   <p className="text-xs md:text-sm text-gray-600">
-                    Check your {confirmationMethod === 'all' ? 'WhatsApp and Email' : confirmationMethod} for complete details.
-                    A confirmation has been sent to {formData.phone} and {formData.email}.
+                    {networkStatus 
+                      ? `Check your ${confirmationMethod === 'all' ? 'WhatsApp and Email' : confirmationMethod} for complete details.`
+                      : 'Your appointment request has been sent via SMS.'}
+                    A confirmation has been sent to {formData.phone}.
                   </p>
                 </div>
                 <button
@@ -742,10 +825,10 @@ Dr. Prity Raushan and Team`;
           >
             <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
               
-              {/* Personal Information Grid */}
-              <div className="grid md:grid-cols-3 gap-4 md:gap-6">
+              {/* Personal Information Grid - Updated with Age and Gender */}
+              <div className="grid md:grid-cols-4 gap-4 md:gap-6">
                 {/* Full Name */}
-                <div className="group">
+                <div className="group md:col-span-2">
                   <label className="block text-gray-700 font-semibold mb-1 md:mb-2 text-sm md:text-base">
                     <span className="flex items-center gap-1 md:gap-2">
                       <svg className="w-4 h-4 md:w-5 md:h-5 text-teal-600 group-focus-within:text-cyan-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -774,6 +857,76 @@ Dr. Prity Raushan and Team`;
                   )}
                 </div>
 
+                {/* Age */}
+                <div className="group">
+                  <label className="block text-gray-700 font-semibold mb-1 md:mb-2 text-sm md:text-base">
+                    <span className="flex items-center gap-1 md:gap-2">
+                      <svg className="w-4 h-4 md:w-5 md:h-5 text-teal-600 group-focus-within:text-cyan-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Age *
+                    </span>
+                  </label>
+                  <input
+                    type="number"
+                    name="age"
+                    value={formData.age}
+                    onChange={handleChange}
+                    min="1"
+                    max="120"
+                    placeholder="25"
+                    className={`w-full border ${
+                      errors.age ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-teal-500 focus:border-teal-500'
+                    } rounded-xl px-3 md:px-4 py-2 md:py-3 text-sm md:text-base focus:ring-2 focus:border-transparent transition-all duration-300 outline-none bg-white/50 backdrop-blur-sm shadow-sm hover:shadow-md`}
+                  />
+                  {errors.age && (
+                    <p className="mt-1 text-xs md:text-sm text-red-600 flex items-center gap-1">
+                      <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {errors.age}
+                    </p>
+                  )}
+                </div>
+
+                {/* Gender */}
+                <div className="group">
+                  <label className="block text-gray-700 font-semibold mb-1 md:mb-2 text-sm md:text-base">
+                    <span className="flex items-center gap-1 md:gap-2">
+                      <svg className="w-4 h-4 md:w-5 md:h-5 text-teal-600 group-focus-within:text-cyan-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      Gender *
+                    </span>
+                  </label>
+                  <select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleChange}
+                    className={`w-full border ${
+                      errors.gender ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-teal-500 focus:border-teal-500'
+                    } rounded-xl px-3 md:px-4 py-2 md:py-3 text-sm md:text-base focus:ring-2 focus:border-transparent transition-all duration-300 outline-none bg-white/50 backdrop-blur-sm shadow-sm hover:shadow-md`}
+                  >
+                    <option value="">Select Gender</option>
+                    {genders.map(gender => (
+                      <option key={gender.value} value={gender.value}>
+                        {gender.label}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.gender && (
+                    <p className="mt-1 text-xs md:text-sm text-red-600 flex items-center gap-1">
+                      <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {errors.gender}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Contact Information Grid */}
+              <div className="grid md:grid-cols-2 gap-4 md:gap-6">
                 {/* Phone Number */}
                 <div className="group">
                   <label className="block text-gray-700 font-semibold mb-1 md:mb-2 text-sm md:text-base">
@@ -806,7 +959,7 @@ Dr. Prity Raushan and Team`;
                       <svg className="w-3 h-3 md:w-4 md:h-4 text-teal-500" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12.04 2C6.58 2 2 6.58 2 12.04c0 1.86.52 3.6 1.42 5.08L2.3 21.7l4.58-1.12c1.48.9 3.22 1.42 5.08 1.42 5.46 0 10.04-4.58 10.04-10.04C22 6.58 17.46 2 12.04 2z"/>
                       </svg>
-                      WhatsApp confirmation will be sent here
+                      {networkStatus ? 'WhatsApp confirmation will be sent here' : 'SMS will be sent here if offline'}
                     </p>
                   )}
                 </div>
@@ -1096,6 +1249,24 @@ Dr. Prity Raushan and Team`;
                 </div>
               </div>
 
+              {/* Offline SMS Option */}
+              {!networkStatus && (
+                <div className="p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+                  <div className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                      <p className="text-sm font-medium text-yellow-800">You're offline</p>
+                      <p className="text-xs text-yellow-700 mt-1">
+                        Your appointment request will be sent as a simple SMS message when you submit the form.
+                        Please ensure your phone has cellular service.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Booking Summary */}
               {showBookingSummary && formData.service && formData.date && formData.time && (
                 <div className="p-4 md:p-6 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl border border-teal-100 animate-fadeIn">
@@ -1106,6 +1277,10 @@ Dr. Prity Raushan and Team`;
                     Booking Summary
                   </h3>
                   <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-gray-500">Patient</p>
+                      <p className="font-semibold text-[#0A2540]">{formData.fullName} ({formData.age}, {formData.gender})</p>
+                    </div>
                     <div>
                       <p className="text-gray-500">Service</p>
                       <p className="font-semibold text-[#0A2540]">{formData.service}</p>
@@ -1121,6 +1296,10 @@ Dr. Prity Raushan and Team`;
                     <div>
                       <p className="text-gray-500">Duration</p>
                       <p className="font-semibold text-[#0A2540]">{getServiceDetails(formData.service).duration}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Contact</p>
+                      <p className="font-semibold text-[#0A2540]">{formData.phone}</p>
                     </div>
                   </div>
                 </div>
@@ -1164,7 +1343,9 @@ Dr. Prity Raushan and Team`;
                   <svg className="w-3 h-3 md:w-4 md:h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  You'll receive confirmation via your selected method(s)
+                  {networkStatus 
+                    ? "You'll receive confirmation via your selected method(s)" 
+                    : "You'll receive a simple SMS confirmation due to offline status"}
                 </p>
               </div>
 
@@ -1223,7 +1404,7 @@ Dr. Prity Raushan and Team`;
                       </>
                     ) : (
                       <>
-                        Confirm Appointment
+                        {networkStatus ? 'Confirm Appointment' : 'Send via SMS'}
                         <svg className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
