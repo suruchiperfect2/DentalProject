@@ -1,124 +1,87 @@
-import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
-
+import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom";
 import NavBar from "./components/NavBar";
-import Dashboard from "./pages/Dashboard";
 import Footer from "./components/Footer";
-import Hero from "./components/Hero";
-
 import About from "./pages/About";
-
-
-
-import Services from "./pages/Service";
-
-
-import Crown from "./pages/Crown";
-import Cosmeticdentistry from "./pages/Cosmeticdentistry";
-import Deepbite from "./pages/Deepbite";
-
-import Dentalfluorosis from "./pages/Dentalfluorosis";
-import DentalImplants from "./pages/DentalImplants";
-import Orthodontics from "./pages/Orthodontics";
-import Rootcanaltreatment from "./pages/Rootcanaltreatment";
-import Pediatricdentistry from "./pages/Pediatricdentistry";
-import Dentaltreatment from "./pages/Dentaltreatment";
-import GenralDentistry from "./pages/GenralDentistry";
-import Earlychildhoodcare from "./pages/Earlychildhoodcare";
-import TeethWhitening from "./pages/TeethWhitening";
-import Spacing from "./pages/Spacing";
-
-
-
-
-
-
-import Testimonials from "./pages/Testimonals";
-import Treatmentcharges from "./pages/Treatmentcharges";
+import AdminLogin from "./pages/AdminLogin";
+import AdminPanel from "./pages/AdminPanel";
 import Appointment from "./pages/Appointment";
 import Contact from "./pages/Contact";
+import Cosmeticdentistry from "./pages/Cosmeticdentistry";
+import Crown from "./pages/Crown";
+import Dashboard from "./pages/Dashboard";
+import Deepbite from "./pages/Deepbite";
+import Dentalfluorosis from "./pages/Dentalfluorosis";
+import DentalImplants from "./pages/DentalImplants";
+import Dentaltreatment from "./pages/Dentaltreatment";
+import Earlychildhoodcare from "./pages/Earlychildhoodcare";
+import GenralDentistry from "./pages/GenralDentistry";
+import HomePage from "./pages/Homepage";
+import Orthodontics from "./pages/Orthodontics";
+import Pediatricdentistry from "./pages/Pediatricdentistry";
+import Rootcanaltreatment from "./pages/Rootcanaltreatment";
+import Spacing from "./pages/Spacing";
+import TeamMemberProfile from "./pages/TeamMemberProfile";
+import TeethWhitening from "./pages/TeethWhitening";
+import Testimonials from "./pages/Testimonals";
+import TreatmentCharges from "./pages/Treatmentcharges";
+import UserDashboard from "./pages/UserDashboard";
+import UserLogin from "./pages/UserLogin";
 
-// ScrollToTop Component - Yeh har route change par top par scroll karega
-const ScrollToTop = () => {
-  const { pathname } = useLocation();
-
-  useEffect(() => {
-    // Har route change par top par scroll karein
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "instant" // Ya "smooth" chahe to
-    });
-  }, [pathname]);
-
-  return null;
-};
-
-// Main App Content with ScrollToTop
 const AppContent = () => {
   return (
-    <div className="relative flex flex-col min-h-screen">
-      <ScrollToTop /> {/* 👈 Yeh line add ki hai */}
-      
-      {/* Navbar */}
+    <>
       <NavBar />
-
-      {/* Page Content */}
-      <main className="flex-grow">
+      <main>
         <Routes>
-          {/* Home page - Sirf ek baar define kiya */}
-          <Route path="/" element={<Dashboard />} />
-          
-          {/* Other pages */}
-          <Route path="/Hero" element={<Hero />} /> {/* Agar Hero alag component hai to */}
-          <Route path="/About" element={<About />} />
-         
-          
-
-          <Route path="/services" element={<Services />} />
-
-
-          <Route path="/Crown" element={<Crown />} /> {/* Changed from "/crown" to "/services/crown" */}
-          <Route path="/Cosmeticdentistry" element={<Cosmeticdentistry />} />
-          <Route path="/Deepbite" element={<Deepbite />} />
-          <Route path="/Dentalfluorosis" element={<Dentalfluorosis />} />
-          <Route path="/DentalImplants" element={<DentalImplants />} />
-       
-          <Route path="/Orthodontics" element={<Orthodontics />} />
-         
-        
-          <Route path="/Rootcanaltreatment" element={<Rootcanaltreatment />} />
-
-
-
-
-
-          <Route path="/Pediatricdentistry" element={<Pediatricdentistry />} />
-          <Route path="/Dentaltreatment" element={<Dentaltreatment />} />
-          <Route path="/GenralDentistry" element={<GenralDentistry />} />
-          <Route path="/Earlychildhoodcare" element={<Earlychildhoodcare />} />
-          <Route path="/TeethWhitening" element={<TeethWhitening />} />
-          <Route path="/Spacing" element={<Spacing />} />
-          
-
-
-          <Route path="/testimonials" element={<Testimonials />} />
-          <Route path="/treatmentcharges" element={<Treatmentcharges />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<About />} />
           <Route path="/appointment" element={<Appointment />} />
           <Route path="/contact" element={<Contact />} />
-          
-          {/* 404 redirect */}
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/login" element={<UserLogin />} />
+          <Route path="/user-dashboard" element={<UserDashboard />} />
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminPanel />} />
+          <Route path="/admin-panel" element={<AdminPanel />} />
+
+          <Route path="/services" element={<Dentaltreatment />} />
+          <Route path="/Dentaltreatments" element={<Dentaltreatment />} />
+          <Route path="/Treatmentcharges" element={<TreatmentCharges />} />
+          <Route path="/reviews" element={<Testimonials />} />
+
+          <Route path="/dental-implants" element={<DentalImplants />} />
+          <Route path="/Crown" element={<Crown />} />
+          <Route path="/Deepbite" element={<Deepbite />} />
+          <Route path="/Dentalfluorosis" element={<Dentalfluorosis />} />
+          <Route path="/Spacing" element={<Spacing />} />
+          <Route path="/Earlychildhoodcare" element={<Earlychildhoodcare />} />
+          <Route path="/Orthodontics" element={<Orthodontics />} />
+          <Route path="/Rootcanaltreatment" element={<Rootcanaltreatment />} />
+          <Route path="/GenralDentistry" element={<GenralDentistry />} />
+          <Route path="/Cosmeticdentistry" element={<Cosmeticdentistry />} />
+          <Route path="/TeethWhitening" element={<TeethWhitening />} />
+          <Route path="/Pediatricdentistry" element={<Pediatricdentistry />} />
+
+          <Route path="/service/dentalimplants" element={<DentalImplants />} />
+          <Route path="/service/crown" element={<Crown />} />
+          <Route path="/service/deepbite" element={<Deepbite />} />
+          <Route path="/service/rootcanaltreatment" element={<Rootcanaltreatment />} />
+          <Route path="/service/orthodontics" element={<Orthodontics />} />
+          <Route path="/service/teethwhitening" element={<TeethWhitening />} />
+          <Route path="/service/cosmeticdentistry" element={<Cosmeticdentistry />} />
+          <Route path="/service/earlychildcaries" element={<Earlychildhoodcare />} />
+          <Route path="/service/:serviceType" element={<TeamMemberProfile />} />
+          <Route path="/team/:doctorId" element={<TeamMemberProfile />} />
+          <Route path="/team" element={<About />} />
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-
-      {/* Footer */}
       <Footer />
-    </div>
+    </>
   );
 };
 
-// Main App Component
 const App = () => {
   return (
     <Router>

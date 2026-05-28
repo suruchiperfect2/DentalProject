@@ -1,37 +1,93 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+const makeMember = (member) => ({
+  about: `${member.name} provides patient-focused dental care with modern techniques and a calm chairside approach.`,
+  languages: ['English', 'Hindi'],
+  availability: 'Monday to Saturday, 9:00 AM to 8:00 PM',
+  services: [member.specialty, 'Consultation', 'Preventive Care'],
+  achievements: ['Recognized for patient-centered dental care', 'Experienced in advanced treatment planning'],
+  certifications: ['Advanced Dental Care Certification', 'Clinical Excellence Program'],
+  education_details: [member.education, 'Continuing education in modern dentistry'],
+  social: {
+    email: 'appointments@drpritydental.com',
+    phone: '+91 98765 43210',
+  },
+  ...member,
+});
+
 const teamMembers = [
-  {
-    id: "dr-prity-raushan",
-    name: "Dr. Prity Raushan",
-    role: "Lead Dental Surgeon",
-    specialty: "Cosmetic & Restorative Dentistry",
-    experience: "12+ Years",
-    image: "https://img.freepik.com/free-photo/beautiful-young-female-doctor-with-stethoscope-looking-camera_85574-4572.jpg?w=740&t=st=1731682800~exp=1731686400~hmac=1234567890",
-    education: "BDS, MDS (Cosmetic Dentistry)",
-    icon: "🦷",
-    profilePath: "/team/dr-prity-raushan",
-    about: "Dr. Prity Raushan is a highly skilled dental surgeon.",
-    languages: ["English", "Hindi"],
-    availability: "Mon-Sat, 9am-5pm",
-    services: ["Cosmetic Dentistry", "Teeth Whitening"],
-    achievements: ["Best Dentist 2023"],
-    certifications: ["Certified Implantologist"],
-    education_details: ["BDS", "MDS"],
-    social: { email: "drprity@example.com", phone: "+91-9876543210" }
-  }
+  makeMember({
+    id: 'dr-prity-raushan',
+    name: 'Dr. Prity Raushan',
+    role: 'Lead Dental Surgeon',
+    specialty: 'Cosmetic & Restorative Dentistry',
+    experience: '12+ Years',
+    education: 'BDS, MDS (Cosmetic Dentistry)',
+    image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=400&q=80',
+  }),
+  makeMember({
+    id: 'dr-rajesh-kumar',
+    name: 'Dr. Rajesh Kumar',
+    role: 'Senior Dental Surgeon',
+    specialty: 'Orthodontics & Implantology',
+    experience: '10+ Years',
+    education: 'BDS, MDS (Orthodontics)',
+    image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=400&q=80',
+  }),
+  makeMember({
+    id: 'dr-sneha-patel',
+    name: 'Dr. Sneha Patel',
+    role: 'Periodontist',
+    specialty: 'Gum Care & Laser Dentistry',
+    experience: '8+ Years',
+    education: 'BDS, MDS (Periodontology)',
+    image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=400&q=80',
+  }),
+  makeMember({
+    id: 'dr-amit-sharma',
+    name: 'Dr. Amit Sharma',
+    role: 'Endodontist',
+    specialty: 'Root Canal & Pain Management',
+    experience: '9+ Years',
+    education: 'BDS, MDS (Endodontics)',
+    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=400&q=80',
+  }),
 ];
 
 const serviceInfo = {
-  cosmeticdentistry: {
-    name: "Cosmetic Dentistry",
-    description: "Improve your smile",
-    icon: "💫",
-    procedure: "Various cosmetic procedures",
-    duration: "1-2 hours",
-    specialists: ["dr-prity-raushan"]
-  }
+  gumtreatment: {
+    name: 'Gum Treatment',
+    icon: 'G',
+    description: 'Periodontal care and gum health treatments',
+    procedure: 'Scaling, root planing, and laser-assisted care as needed',
+    duration: '45-60 minutes',
+    specialists: ['dr-sneha-patel'],
+  },
+  dentures: {
+    name: 'Dentures',
+    icon: 'D',
+    description: 'Complete and partial dentures for missing teeth',
+    procedure: 'Consultation, impressions, trial fitting, and final placement',
+    duration: '2-4 visits',
+    specialists: ['dr-prity-raushan'],
+  },
+  veneers: {
+    name: 'Veneers',
+    icon: 'V',
+    description: 'Porcelain veneers for smile makeover',
+    procedure: 'Smile design, tooth preparation, impressions, and bonding',
+    duration: '2-3 visits',
+    specialists: ['dr-prity-raushan'],
+  },
+  bridges: {
+    name: 'Bridges',
+    icon: 'B',
+    description: 'Fixed bridges for missing teeth',
+    procedure: 'Assessment, preparation, impressions, and final cementation',
+    duration: '2-3 visits',
+    specialists: ['dr-prity-raushan'],
+  },
 };
 
 const TeamMemberProfile = () => {
@@ -39,17 +95,28 @@ const TeamMemberProfile = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('about');
 
-  const member = doctorId ? teamMembers.find(m => m.id === doctorId) || null : null;
-  const service = serviceType ? serviceInfo[serviceType.toLowerCase().replace(/\s+/g, '')] || null : null;
-  const relatedSpecialists = service ? teamMembers.filter(m => service.specialists.includes(m.id)) : [];
+  const member = useMemo(
+    () => (doctorId ? teamMembers.find((item) => item.id === doctorId) : null),
+    [doctorId]
+  );
+  const service = useMemo(
+    () => (serviceType ? serviceInfo[serviceType.toLowerCase().replace(/\s+/g, '')] : null),
+    [serviceType]
+  );
+  const relatedSpecialists = useMemo(
+    () => (service ? teamMembers.filter((item) => service.specialists.includes(item.id)) : []),
+    [service]
+  );
 
   useEffect(() => {
     if (doctorId && !member) {
       navigate('/team');
-    } else if (serviceType && !service) {
+    }
+
+    if (serviceType && !service) {
       navigate('/services');
     }
-  }, [doctorId, serviceType, member, service, navigate]);
+  }, [doctorId, member, navigate, service, serviceType]);
 
   if (!member && !service) {
     return (

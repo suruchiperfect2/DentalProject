@@ -1,5 +1,3 @@
-import React from "react";
-
 const HomePage = () => {
   return (
     <div className="w-full min-h-screen bg-gray-50">
@@ -69,4 +67,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-

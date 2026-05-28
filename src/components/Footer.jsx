@@ -185,18 +185,21 @@ const Footer = () => {
 
             {/* Social Links */}
             <div className="flex space-x-2">
-              {socialLinks.map(({ Icon, url, label }, index) => (
-                <a
-                  key={index}
-                  href={url}
-                  aria-label={label}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-white rounded-xl shadow-md flex items-center justify-center hover:bg-gradient-to-r hover:from-teal-400 hover:to-teal-600 hover:shadow-xl transition-all duration-300 group"
-                >
-                  <Icon className="w-4 h-4 text-gray-700 group-hover:text-white transition-colors duration-300" />
-                </a>
-              ))}
+              {socialLinks.map((link, index) => {
+                const SocialIcon = link.Icon;
+                return (
+                  <a
+                    key={index}
+                    href={link.url}
+                    aria-label={link.label}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 bg-white rounded-xl shadow-md flex items-center justify-center hover:bg-gradient-to-r hover:from-teal-400 hover:to-teal-600 hover:shadow-xl transition-all duration-300 group"
+                  >
+                    <SocialIcon className="w-4 h-4 text-gray-700 group-hover:text-white transition-colors duration-300" />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
@@ -302,21 +305,24 @@ const Footer = () => {
 
             {/* Contact Info */}
             <div className="space-y-3">
-              {contactInfo.map(({ Icon, text, sub, action }, index) => (
-                <a
-                  key={index}
-                  href={action}
-                  className="group flex items-center space-x-3 p-3 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-                >
-                  <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                    <Icon className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-teal-600 font-medium">{sub}</p>
-                    <p className="text-gray-900 font-medium text-xs break-words">{text}</p>
-                  </div>
-                </a>
-              ))}
+              {contactInfo.map((item, index) => {
+                const ContactIcon = item.Icon;
+                return (
+                  <a
+                    key={index}
+                    href={item.action}
+                    className="group flex items-center space-x-3 p-3 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                  >
+                    <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                      <ContactIcon className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-teal-600 font-medium">{item.sub}</p>
+                      <p className="text-gray-900 font-medium text-xs break-words">{item.text}</p>
+                    </div>
+                  </a>
+                );
+              })}
             </div>
 
             {/* Simple Address Display - Non-interactive */}

@@ -4,12 +4,14 @@ import {
   Phone, Mail, MapPin, Clock, Send, ChevronRight, 
   Calendar, User, ArrowRight 
 } from "lucide-react";
+import { contactService } from "../services/api";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     phone: "",
+    service: "",
     message: ""
   });
 
@@ -30,11 +32,16 @@ const Contact = () => {
     setSubmitStatus(null);
 
     try {
-      // Simulate API call - replace with your actual endpoint
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await contactService.submit({
+        name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        subject: formData.service || "General enquiry",
+        message: formData.message,
+      });
       setSubmitStatus('success');
-      setFormData({ fullName: "", email: "", phone: "", message: "" });
-    } catch (e) {
+      setFormData({ fullName: "", email: "", phone: "", service: "", message: "" });
+        } catch (e) {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -53,7 +60,7 @@ const Contact = () => {
     {
       icon: <Phone className="w-6 h-6" />,
       title: "Call Us",
-      details: ["+91 98765 43210", "+91 12345 67890 (24/7)"]
+      details: ["+91 82528 18799", "+91 82528 18799 (24/7)"]
     },
     {
       icon: <Mail className="w-6 h-6" />,
@@ -243,7 +250,7 @@ const Contact = () => {
                         onChange={handleChange}
                         required
                         className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition"
-                        placeholder="+91 98765 43210"
+                        placeholder="+91 8252818799"
                       />
                     </div>
 
@@ -251,6 +258,8 @@ const Contact = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-2">Service</label>
                       <select
                         name="service"
+                        value={formData.service}
+                        onChange={handleChange}
                         className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition bg-white"
                       >
                         <option value="">Select a service</option>
