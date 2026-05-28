@@ -24,7 +24,6 @@ const Appointment = () => {
   const [errors, setErrors] = useState({});
   const [isVisible, setIsVisible] = useState({});
   const [availableSlots, setAvailableSlots] = useState([]);
-  const [selectedDate, setSelectedDate] = useState("");
   const [showBookingSummary, setShowBookingSummary] = useState(false);
 
   // Updated images with dental/medical theme
@@ -432,7 +431,7 @@ Dr. Prity Raushan and Team`;
 
     // Create mailto link
     const mailtoLink = `mailto:${formData.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoLink;
+    window.location.assign(mailtoLink);
   };
 
   // Make phone call
@@ -444,14 +443,14 @@ Dr. Prity Raushan and Team`;
     };
     
     const phoneNumber = numbers[type] || numbers.clinic;
-    window.location.href = `tel:${phoneNumber}`;
+    window.location.assign(`tel:${phoneNumber}`);
   };
 
   // Send SMS
   const sendSMS = () => {
     const message = `Appointment with Dr. Prity Raushan on ${formatDate(formData.date)} at ${formData.time}. Reply Y to confirm.`;
     const smsLink = `sms:+919876543210?body=${encodeURIComponent(message)}`;
-    window.location.href = smsLink;
+    window.location.assign(smsLink);
   };
 
   // Handle confirmation based on selected method

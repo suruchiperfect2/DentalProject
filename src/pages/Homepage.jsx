@@ -1,6 +1,6 @@
 import React from "react";
 
-const homePage = () => {
+const HomePage = () => {
   return (
     <div className="w-full min-h-screen bg-gray-50">
 

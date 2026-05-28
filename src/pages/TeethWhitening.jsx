@@ -30,6 +30,7 @@ import {
   Feather,
   Gauge,
   RefreshCw,
+  Pill,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 

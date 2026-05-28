@@ -1,45 +1,55 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
+const teamMembers = [
+  {
+    id: "dr-prity-raushan",
+    name: "Dr. Prity Raushan",
+    role: "Lead Dental Surgeon",
+    specialty: "Cosmetic & Restorative Dentistry",
+    experience: "12+ Years",
+    image: "https://img.freepik.com/free-photo/beautiful-young-female-doctor-with-stethoscope-looking-camera_85574-4572.jpg?w=740&t=st=1731682800~exp=1731686400~hmac=1234567890",
+    education: "BDS, MDS (Cosmetic Dentistry)",
+    icon: "🦷",
+    profilePath: "/team/dr-prity-raushan",
+    about: "Dr. Prity Raushan is a highly skilled dental surgeon.",
+    languages: ["English", "Hindi"],
+    availability: "Mon-Sat, 9am-5pm",
+    services: ["Cosmetic Dentistry", "Teeth Whitening"],
+    achievements: ["Best Dentist 2023"],
+    certifications: ["Certified Implantologist"],
+    education_details: ["BDS", "MDS"],
+    social: { email: "drprity@example.com", phone: "+91-9876543210" }
+  }
+];
+
+const serviceInfo = {
+  cosmeticdentistry: {
+    name: "Cosmetic Dentistry",
+    description: "Improve your smile",
+    icon: "💫",
+    procedure: "Various cosmetic procedures",
+    duration: "1-2 hours",
+    specialists: ["dr-prity-raushan"]
+  }
+};
 
 const TeamMemberProfile = () => {
   const { doctorId, serviceType } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [member, setMember] = useState(null);
-  const [service, setService] = useState(null);
-  const [relatedSpecialists, setRelatedSpecialists] = useState([]);
   const [activeTab, setActiveTab] = useState('about');
 
+  const member = doctorId ? teamMembers.find(m => m.id === doctorId) || null : null;
+  const service = serviceType ? serviceInfo[serviceType.toLowerCase().replace(/\s+/g, '')] || null : null;
+  const relatedSpecialists = service ? teamMembers.filter(m => service.specialists.includes(m.id)) : [];
+
   useEffect(() => {
-    // Check if we're viewing a doctor profile
-    if (doctorId) {
-      const foundMember = teamMembers.find(m => m.id === doctorId);
-      if (foundMember) {
-        setMember(foundMember);
-        setService(null);
-      } else {
-        navigate('/team');
-      }
+    if (doctorId && !member) {
+      navigate('/team');
+    } else if (serviceType && !service) {
+      navigate('/services');
     }
-    
-    // Check if we're viewing a service
-    if (serviceType) {
-      const foundService = serviceInfo[serviceType.toLowerCase().replace(/\s+/g, '')];
-      if (foundService) {
-        setService(foundService);
-        setMember(null);
-        
-        // Get related specialists
-        const specialists = teamMembers.filter(m => 
-          foundService.specialists.includes(m.id)
-        );
-        setRelatedSpecialists(specialists);
-      } else {
-        navigate('/services');
-      }
-    }
-  }, [doctorId, serviceType, navigate]);
+  }, [doctorId, serviceType, member, service, navigate]);
 
   if (!member && !service) {
     return (
