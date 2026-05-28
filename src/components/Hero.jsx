@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import heroDentalImage from '../assets/dental photo 1.png';
 
 const Hero = () => {
   const [showText, setShowText] = useState(false);
@@ -15,7 +16,7 @@ const Hero = () => {
   const [currentTip, setCurrentTip] = useState(0);
   const [showCostCalculator, setShowCostCalculator] = useState(false);
   const [activeFaq, setActiveFaq] = useState(null);
-  const [treatmentCosts, setTreatmentCosts] = useState({
+  const [treatmentCosts] = useState({
     'Root Canal': { min: 5000, max: 15000 },
     'Teeth Whitening': { min: 8000, max: 25000 },
     'Dental Crowns': { min: 7000, max: 20000 },
@@ -230,17 +231,14 @@ const Hero = () => {
 
   // Text animation effect
   useEffect(() => {
-    setShowText(true);
-    
-    // Set available slots (mock data)
-    setAvailableSlots(['10:30 AM', '11:45 AM', '2:15 PM', '4:30 PM']);
-    
-    // Set recent reviews
-    setRecentReviews(testimonials.slice(0, 3));
-    
-    // Check if it's emergency hours (after 8 PM)
-    const currentHour = new Date().getHours();
-    setShowEmergencyBanner(currentHour >= 20 || currentHour <= 6);
+    const frameId = requestAnimationFrame(() => {
+      setShowText(true);
+      setAvailableSlots(['10:30 AM', '11:45 AM', '2:15 PM', '4:30 PM']);
+      setRecentReviews(testimonials.slice(0, 3));
+
+      const currentHour = new Date().getHours();
+      setShowEmergencyBanner(currentHour >= 20 || currentHour <= 6);
+    });
     
     // Rotate dental tips every 10 seconds
     const tipInterval = setInterval(() => {
@@ -251,9 +249,11 @@ const Hero = () => {
     const quizTimer = setTimeout(() => setShowQuiz(true), 30000);
     
     return () => {
+      cancelAnimationFrame(frameId);
       clearInterval(tipInterval);
       clearTimeout(quizTimer);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Count-up animation when in viewport
@@ -313,7 +313,7 @@ const Hero = () => {
     if (badge === "Insurance Accepted") {
       setShowInsuranceCheck(true);
     } else {
-      window.location.href = `/certifications/${badge.toLowerCase().replace(/\s+/g, '-')}`;
+      window.location.assign(`/certifications/${badge.toLowerCase().replace(/\s+/g, '-')}`);
     }
   };
 
@@ -344,7 +344,7 @@ const Hero = () => {
     window.location.href = 'tel:+911234567890';
   };
 
-  const handleQuizAnswer = (answer) => {
+  const handleQuizAnswer = () => {
     setShowQuiz(false);
     alert(`Based on your answers, we recommend a dental checkup! Book now for special discount.`);
   };
@@ -544,9 +544,9 @@ const Hero = () => {
                   {/* Doctor Portrait */}
                   <div className="relative animate-float">
                     <img
-                      src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                      alt="Dr. Prity Raushan - Dental Expert"
-                      className="w-full h-auto object-cover rounded-2xl border-4 border-white shadow-2xl"
+                      src={heroDentalImage}
+                      alt="Dentist consultation at Dr. Prity Raushan dental clinic"
+                      className="w-full h-[360px] md:h-[520px] object-cover rounded-2xl border-4 border-white shadow-2xl"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0A2540]/20 via-transparent to-transparent rounded-2xl"></div>
                   </div>

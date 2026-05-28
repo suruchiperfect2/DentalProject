@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { appointmentService } from "../services/api";
 
 const Appointment = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -26,10 +27,20 @@ const Appointment = () => {
   const [errors, setErrors] = useState({});
   const [isVisible, setIsVisible] = useState({});
   const [availableSlots, setAvailableSlots] = useState([]);
-  const [selectedDate, setSelectedDate] = useState("");
   const [showBookingSummary, setShowBookingSummary] = useState(false);
   const [networkStatus, setNetworkStatus] = useState(navigator.onLine);
   const [showOfflineMessage, setShowOfflineMessage] = useState(false);
+
+  useEffect(() => {
+    const savedUser = JSON.parse(localStorage.getItem("user") || "{}");
+    if (savedUser.email || savedUser.name) {
+      setFormData((prev) => ({
+        ...prev,
+        fullName: prev.fullName || savedUser.name || "",
+        email: prev.email || savedUser.email || "",
+      }));
+    }
+  }, []);
 
   // Updated images with dental/medical theme
   const slides = [
@@ -357,9 +368,9 @@ New Delhi - 110001
 🔗 https://maps.google.com/?q=Clinic+Location
 
 📞 *CONTACT NUMBERS*
-• Appointment: +91 98765 43210
-• Emergency (24/7): +91 98765 43211
-• WhatsApp: +91 98765 43212
+• Appointment: +91 82528 18799
+• Emergency (24/7): +91 82528 18799
+• WhatsApp: +91 82528 18799
 
 ⏰ *CLINIC HOURS*
 Monday - Saturday: 9:00 AM - 7:00 PM
@@ -384,7 +395,7 @@ ${formData.message ? `📌 *YOUR MESSAGE*: "${formData.message}"` : ''}
 
 ━━━━━━━━━━━━━━━━━━━━━
 *Need to reschedule or cancel?*
-📞 Call: +91 98765 43210
+📞 Call: +91 82528 18799
 💬 WhatsApp: +91 98765 43212
 📧 Email: appointments@dentalclinic.com
 ⏰ Please notify at least 24 hours in advance
@@ -431,10 +442,10 @@ New Delhi - 110001
 Google Maps: https://maps.google.com/?q=Clinic+Location
 
 CONTACT INFORMATION:
-• Phone: +91 98765 43210
-• Emergency: +91 98765 43211
+• Phone: +91 82528 18799
+• Emergency: +91 82528 18799
 • Email: appointments@dentalclinic.com
-• WhatsApp: +91 98765 43212
+• WhatsApp: +91 82528 18799
 
 CLINIC HOURS:
 Monday - Saturday: 9:00 AM - 7:00 PM
@@ -459,7 +470,7 @@ ${formData.message ? `YOUR MESSAGE TO US: "${formData.message}"` : ''}
 
 ══════════════════════════════════════
 To reschedule or cancel:
-Call: +91 98765 43210
+Call: +91 82528 18799
 Email: appointments@dentalclinic.com
 Please notify at least 24 hours in advance
 ══════════════════════════════════════
@@ -522,7 +533,7 @@ Dr. Prity Raushan and Team`;
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -537,15 +548,29 @@ Dr. Prity Raushan and Team`;
     
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Form submitted:", formData);
+    try {
+      await appointmentService.create({
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        age: Number(formData.age),
+        gender: formData.gender,
+        service: formData.service,
+        preferredDate: formData.date,
+        preferredTime: formData.time,
+        message: formData.message,
+        preferredDoctor: formData.preferredDoctor,
+        isFirstVisit: formData.isFirstVisit,
+        hasInsurance: formData.hasInsurance,
+        insuranceProvider: formData.insuranceProvider,
+        consentSMS: formData.consentSMS,
+        consentWhatsApp: formData.consentWhatsApp,
+      });
+
       setShowSuccess(true);
       
       // Send confirmations based on selected method
       handleConfirmations();
-      
-      setIsSubmitting(false);
       
       // Hide success message after 8 seconds
       setTimeout(() => setShowSuccess(false), 8000);
@@ -569,7 +594,11 @@ Dr. Prity Raushan and Team`;
         consentWhatsApp: true
       });
       setShowBookingSummary(false);
-    }, 1500);
+    } catch (error) {
+      alert(error.message || "Unable to book appointment. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Get today's date for min attribute
@@ -1426,8 +1455,8 @@ Dr. Prity Raushan and Team`;
                   </div>
                   <h3 className="font-semibold text-[#0A2540] mb-1 text-sm md:text-base">Call Us</h3>
                   <p className="text-xs text-gray-500 mb-1 md:mb-2">24/7 Emergency</p>
-                  <a href="tel:+919876543210" className="text-teal-600 hover:text-teal-700 font-medium text-xs md:text-sm transition-colors">
-                    +91 98765 43210
+                  <a href="tel:+918252818799" className="text-teal-600 hover:text-teal-700 font-medium text-xs md:text-sm transition-colors">
+                    +91 82528 18799
                   </a>
                 </div>
                 <div className="text-center group">
@@ -1450,8 +1479,8 @@ Dr. Prity Raushan and Team`;
                   </div>
                   <h3 className="font-semibold text-[#0A2540] mb-1 text-sm md:text-base">WhatsApp</h3>
                   <p className="text-xs text-gray-500 mb-1 md:mb-2">Quick response</p>
-                  <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:text-teal-700 font-medium text-xs md:text-sm transition-colors">
-                    +91 98765 43210
+                  <a href="https://wa.me/918252818799" target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:text-teal-700 font-medium text-xs md:text-sm transition-colors">
+                    +91 82528 18799
                   </a>
                 </div>
               </div>

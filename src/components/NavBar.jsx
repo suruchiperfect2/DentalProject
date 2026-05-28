@@ -9,6 +9,7 @@ import logo from "../assets/logo_no_background.png"; // Your logo import
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   const menuItems = [
     { 
@@ -38,6 +39,19 @@ const NavBar = () => {
     { path: "/contact", label: "Contact" },
   ];
 
+  const loginOptions = [
+    {
+      path: "/login",
+      label: "User Login",
+      description: "Patient account",
+    },
+    {
+      path: "/admin",
+      label: "Admin Login",
+      description: "Clinic dashboard",
+    },
+  ];
+
   // Organize services into categories for better UX
   const servicesCategories = {
     "Restorative": ["Crowns", "Dental Implants", "Root Canal Treatment"],
@@ -50,6 +64,7 @@ const NavBar = () => {
   // Function to handle navigation and close menus
   const handleNavigation = () => {
     setActiveDropdown(null);
+    setIsLoginOpen(false);
     setIsOpen(false);
   };
 
@@ -215,6 +230,45 @@ const NavBar = () => {
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-teal-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Link>
+
+              {/* Single Login Icon with User/Admin options */}
+              <div className="relative">
+                <button
+                  type="button"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-teal-100 bg-white text-teal-700 shadow-soft-medical transition-all duration-300 hover:border-teal-300 hover:bg-teal-50 hover:shadow-lg"
+                  aria-label="Login options"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setIsLoginOpen((prev) => !prev);
+                    setActiveDropdown(null);
+                  }}
+                >
+                  <User className="h-5 w-5" />
+                </button>
+
+                {isLoginOpen && (
+                  <div className="absolute right-0 top-full z-[70] mt-2 w-64 overflow-hidden rounded-2xl border border-teal-100 bg-white shadow-xl animate-fadeIn">
+                    <div className="bg-gradient-to-r from-teal-50 to-cyan-50 px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-teal-700">
+                        Login Options
+                      </p>
+                    </div>
+                    <div className="p-2">
+                      {loginOptions.map((option) => (
+                        <Link
+                          key={option.path}
+                          to={option.path}
+                          className="block rounded-xl px-4 py-3 transition hover:bg-teal-50"
+                          onClick={handleNavigation}
+                        >
+                          <span className="block font-semibold text-deep-navy">{option.label}</span>
+                          <span className="text-sm text-slate-500">{option.description}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* MOBILE MENU BUTTON */}
@@ -328,6 +382,29 @@ const NavBar = () => {
                 <span>Book Appointment</span>
               </span>
             </Link>
+
+            {/* Mobile Login Options */}
+            <div className="rounded-2xl border border-teal-100 bg-gradient-to-r from-teal-50 to-cyan-50 p-3">
+              <div className="mb-2 flex items-center gap-2 font-semibold text-deep-navy">
+                <User className="h-4 w-4 text-teal-600" />
+                <span>Login</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {loginOptions.map((option) => (
+                  <Link
+                    key={option.path}
+                    to={option.path}
+                    className="rounded-xl bg-white px-3 py-2 text-center text-sm font-semibold text-teal-700 shadow-sm transition hover:bg-teal-600 hover:text-white"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNavigation();
+                    }}
+                  >
+                    {option.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
 
             {/* Mobile Contact Info */}
             <div className="pt-4 border-t border-teal-100 space-y-3">

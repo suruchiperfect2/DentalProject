@@ -1,45 +1,122 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 
+const makeMember = (member) => ({
+  about: `${member.name} provides patient-focused dental care with modern techniques and a calm chairside approach.`,
+  languages: ['English', 'Hindi'],
+  availability: 'Monday to Saturday, 9:00 AM to 8:00 PM',
+  services: [member.specialty, 'Consultation', 'Preventive Care'],
+  achievements: ['Recognized for patient-centered dental care', 'Experienced in advanced treatment planning'],
+  certifications: ['Advanced Dental Care Certification', 'Clinical Excellence Program'],
+  education_details: [member.education, 'Continuing education in modern dentistry'],
+  social: {
+    email: 'appointments@drpritydental.com',
+    phone: '+91 98765 43210',
+  },
+  ...member,
+});
+
+const teamMembers = [
+  makeMember({
+    id: 'dr-prity-raushan',
+    name: 'Dr. Prity Raushan',
+    role: 'Lead Dental Surgeon',
+    specialty: 'Cosmetic & Restorative Dentistry',
+    experience: '12+ Years',
+    education: 'BDS, MDS (Cosmetic Dentistry)',
+    image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=400&q=80',
+  }),
+  makeMember({
+    id: 'dr-rajesh-kumar',
+    name: 'Dr. Rajesh Kumar',
+    role: 'Senior Dental Surgeon',
+    specialty: 'Orthodontics & Implantology',
+    experience: '10+ Years',
+    education: 'BDS, MDS (Orthodontics)',
+    image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=400&q=80',
+  }),
+  makeMember({
+    id: 'dr-sneha-patel',
+    name: 'Dr. Sneha Patel',
+    role: 'Periodontist',
+    specialty: 'Gum Care & Laser Dentistry',
+    experience: '8+ Years',
+    education: 'BDS, MDS (Periodontology)',
+    image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=400&q=80',
+  }),
+  makeMember({
+    id: 'dr-amit-sharma',
+    name: 'Dr. Amit Sharma',
+    role: 'Endodontist',
+    specialty: 'Root Canal & Pain Management',
+    experience: '9+ Years',
+    education: 'BDS, MDS (Endodontics)',
+    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=400&q=80',
+  }),
+];
+
+const serviceInfo = {
+  gumtreatment: {
+    name: 'Gum Treatment',
+    icon: 'G',
+    description: 'Periodontal care and gum health treatments',
+    procedure: 'Scaling, root planing, and laser-assisted care as needed',
+    duration: '45-60 minutes',
+    specialists: ['dr-sneha-patel'],
+  },
+  dentures: {
+    name: 'Dentures',
+    icon: 'D',
+    description: 'Complete and partial dentures for missing teeth',
+    procedure: 'Consultation, impressions, trial fitting, and final placement',
+    duration: '2-4 visits',
+    specialists: ['dr-prity-raushan'],
+  },
+  veneers: {
+    name: 'Veneers',
+    icon: 'V',
+    description: 'Porcelain veneers for smile makeover',
+    procedure: 'Smile design, tooth preparation, impressions, and bonding',
+    duration: '2-3 visits',
+    specialists: ['dr-prity-raushan'],
+  },
+  bridges: {
+    name: 'Bridges',
+    icon: 'B',
+    description: 'Fixed bridges for missing teeth',
+    procedure: 'Assessment, preparation, impressions, and final cementation',
+    duration: '2-3 visits',
+    specialists: ['dr-prity-raushan'],
+  },
+};
 
 const TeamMemberProfile = () => {
   const { doctorId, serviceType } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [member, setMember] = useState(null);
-  const [service, setService] = useState(null);
-  const [relatedSpecialists, setRelatedSpecialists] = useState([]);
   const [activeTab, setActiveTab] = useState('about');
 
+  const member = useMemo(
+    () => (doctorId ? teamMembers.find((item) => item.id === doctorId) : null),
+    [doctorId]
+  );
+  const service = useMemo(
+    () => (serviceType ? serviceInfo[serviceType.toLowerCase().replace(/\s+/g, '')] : null),
+    [serviceType]
+  );
+  const relatedSpecialists = useMemo(
+    () => (service ? teamMembers.filter((item) => service.specialists.includes(item.id)) : []),
+    [service]
+  );
+
   useEffect(() => {
-    // Check if we're viewing a doctor profile
-    if (doctorId) {
-      const foundMember = teamMembers.find(m => m.id === doctorId);
-      if (foundMember) {
-        setMember(foundMember);
-        setService(null);
-      } else {
-        navigate('/team');
-      }
+    if (doctorId && !member) {
+      navigate('/team');
     }
-    
-    // Check if we're viewing a service
-    if (serviceType) {
-      const foundService = serviceInfo[serviceType.toLowerCase().replace(/\s+/g, '')];
-      if (foundService) {
-        setService(foundService);
-        setMember(null);
-        
-        // Get related specialists
-        const specialists = teamMembers.filter(m => 
-          foundService.specialists.includes(m.id)
-        );
-        setRelatedSpecialists(specialists);
-      } else {
-        navigate('/services');
-      }
+
+    if (serviceType && !service) {
+      navigate('/services');
     }
-  }, [doctorId, serviceType, navigate]);
+  }, [doctorId, member, navigate, service, serviceType]);
 
   if (!member && !service) {
     return (
