@@ -38,7 +38,7 @@ const UserDashboard = () => {
   const [error, setError] = useState("");
   const [payingId, setPayingId] = useState("");
 
-  const loadAppointments = async () => {
+  const loadAppointments = React.useCallback(async () => {
     if (!token) return;
     setIsLoading(true);
     setError("");
@@ -51,11 +51,11 @@ const UserDashboard = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     loadAppointments();
-  }, []);
+  }, [loadAppointments]);
 
   const nextAppointment = useMemo(() => {
     const now = new Date();

@@ -45,7 +45,7 @@
     "tailwindcss": "^4.2.1",
     "vite": "^7.3.1"
   },
-  "description": "<<<<<<< HEAD\r # React + Vite",
+  "description": "DentalProject - React + Vite website",
   "main": "eslint.config.js",
   "repository": {
     "type": "git",

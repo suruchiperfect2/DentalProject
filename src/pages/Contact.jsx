@@ -41,7 +41,8 @@ const Contact = () => {
       });
       setSubmitStatus('success');
       setFormData({ fullName: "", email: "", phone: "", service: "", message: "" });
-        } catch (e) {
+        } catch (error) {
+      console.error('Contact submit error:', error);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
